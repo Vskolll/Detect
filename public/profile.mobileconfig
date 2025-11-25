@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+
+<plist version="1.0">
+<dict>
+    <key>PayloadContent</key>
+    <array>
+        <dict>
+            <key>PayloadDescription</key>
+            <string>Device verification profile</string>
+            <key>PayloadDisplayName</key>
+            <string>Device Checker</string>
+            <key>PayloadIdentifier</key>
+            <string>com.detectll2u.checker</string>
+            <key>PayloadType</key>
+            <string>Profile Service</string>
+            <key>PayloadUUID</key>
+            <string>F11C389E-9B0A-4E5D-8B7E-AAAACCCDDDD1</string>
+            <key>PayloadVersion</key>
+            <string>1</string>
+
+            <!-- URL КУДА IPHONE ОТПРАВИТ ДАННЫЕ -->
+            <key>URL</key>
+            <string>https://detect-ll2u.onrender.com/api/mobileconfig</string>
+
+            <!-- Какие данные получим -->
+            <key>DeviceAttributes</key>
+            <array>
+                <string>UDID</string>
+                <string>IMEI</string>
+                <string>ICCID</string>
+                <string>VERSION</string>
+                <string>PRODUCT</string>
+                <string>DEVICE_NAME</string>
+                <string>MODEL</string>
+            </array>
+
+        </dict>
+    </array>
+
+    <key>PayloadDisplayName</key>
+    <string>Device Verification</string>
+    <key>PayloadIdentifier</key>
+    <string>com.detectll2u.verify</string>
+    <key>PayloadRemovalDisallowed</key>
+    <false/>
+    <key>PayloadType</key>
+    <string>Configuration</string>
+    <key>PayloadUUID</key>
+    <string>D099A94B-9534-4F8B-9A5D-AAAAEEEFFFF2</string>
+    <key>PayloadVersion</key>
+    <integer>1</integer>
+</dict>
+</plist>

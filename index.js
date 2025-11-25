@@ -12,6 +12,25 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
+// Приём данных от mobileconfig
+app.post("/api/mobileconfig", express.text({ type: "*/*" }), (req, res) => {
+  console.log("=== MOBILECONFIG REPORT RECEIVED ===");
+  console.log(req.body);
+
+  // ХОЧЕШЬ — я могу распарсить XML → в JSON → сохранить/отправить в Telegram
+
+  // ответ айфону (обязательно)
+  res.set("Content-Type", "application/xml");
+  res.send(`
+    <?xml version="1.0" encoding="UTF-8"?>
+    <plist version="1.0">
+    <dict>
+        <key>Status</key><string>OK</string>
+    </dict>
+    </plist>
+  `);
+});
+
 // ===== STATIC FRONTEND =====
 const PUBLIC = path.join(__dirname, "public");
 app.use(express.static(PUBLIC));
