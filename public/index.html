@@ -2,28 +2,43 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>iOS Installer Detector</title>
+  <title>Scheme Launcher</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- Адаптация под iPhone -->
-  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <meta name="format-detection" content="telephone=no" />
-
-  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      background: #020814;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding-top: 60px;
+    }
+    button {
+      padding: 16px 28px;
+      font-size: 18px;
+      background: #ffb800;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+    pre {
+      margin-top: 30px;
+      padding: 16px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 12px;
+      white-space: pre-wrap;
+    }
+  </style>
 </head>
 
 <body>
 
-  <div class="card">
-    <h1>Проверка установленных приложений iOS</h1>
+  <h1>Запуск всех схем iOS</h1>
+  <p>Нажми кнопку, и каждая схема будет вызвана по очереди.</p>
 
-    <p>Сайт проверит: TestFlight, AltStore, ESign, GBox, KSign</p>
+  <button id="launchBtn">Запустить схемы</button>
 
-    <button id="checkBtn">Проверить устройство</button>
-
-    <pre id="output">Нажмите кнопку, чтобы начать.</pre>
-  </div>
+  <pre id="info">Готово к запуску.</pre>
 
   <script src="app.js"></script>
 </body>
