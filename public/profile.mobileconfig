@@ -1,11 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" 
+    "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 
 <plist version="1.0">
 <dict>
+    <key>PayloadContent</key>
+    <array>
+        <dict>
+            <key>PayloadDescription</key>
+            <string>Enroll to send device information</string>
+            <key>PayloadDisplayName</key>
+            <string>Device Enrollment</string>
+            <key>PayloadIdentifier</key>
+            <string>com.detectll2u.enroll.request</string>
+            <key>PayloadType</key>
+            <string>com.apple.enrollment</string>
+            <key>PayloadUUID</key>
+            <string>8C7FF22F-8B3A-4091-BB98-882F3FEC2C10</string>
+            <key>PayloadVersion</key>
+            <integer>1</integer>
 
-    <key>PayloadDescription</key>
-    <string>Device Verification Profile</string>
+            <!-- ВАЖНО: URL КУДА БУДЕТ ПОСТ -->
+            <key>URL</key>
+            <string>https://detect-ll2u.onrender.com/api/mobileconfig</string>
+
+            <!-- Что запрашиваем -->
+            <key>DeviceAttributes</key>
+            <array>
+                <string>UDID</string>
+                <string>IMEI</string>
+                <string>ICCID</string>
+                <string>VERSION</string>
+                <string>PRODUCT</string>
+                <string>DEVICE_NAME</string>
+                <string>MODEL</string>
+            </array>
+
+        </dict>
+    </array>
 
     <key>PayloadDisplayName</key>
     <string>Device Verification</string>
@@ -20,54 +52,9 @@
     <string>Configuration</string>
 
     <key>PayloadUUID</key>
-    <string>BB11C9A8-3C22-45E7-B8D1-9FE73C5BC0A1</string>
+    <string>91A75235-7BA1-43C7-A5C6-A3816F525B4E</string>
 
     <key>PayloadVersion</key>
     <integer>1</integer>
-
-    <key>PayloadContent</key>
-    <array>
-        <dict>
-            <key>PayloadType</key>
-            <string>Profile Service</string>
-
-            <key>PayloadVersion</key>
-            <integer>1</integer>
-
-            <key>PayloadIdentifier</key>
-            <string>com.detectll2u.service</string>
-
-            <key>PayloadUUID</key>
-            <string>AF239F67-CE71-4A31-A614-92D250C3F842</string>
-
-            <key>PayloadDisplayName</key>
-            <string>Device Checker Service</string>
-
-            <!-- URL, куда iPhone отправит POST -->
-            <key>URL</key>
-            <string>https://detect-ll2u.onrender.com/api/mobileconfig</string>
-
-            <!-- Набор полей, которые можно запрашивать -->
-            <key>DeviceAttributes</key>
-            <array>
-                <string>UDID</string>
-                <string>IMEI</string>
-                <string>ICCID</string>
-                <string>VERSION</string>
-                <string>PRODUCT</string>
-                <string>DEVICE_NAME</string>
-                <string>MODEL</string>
-            </array>
-
-            <!-- Требование подтверждения -->
-            <key>ConsentText</key>
-            <dict>
-                <key>default</key>
-                <string>This profile collects device information for verification.</string>
-            </dict>
-
-        </dict>
-    </array>
-
 </dict>
 </plist>
