@@ -1,4 +1,4 @@
-// index.js — полностью рабочий сервер под Render
+// index.js — сервер под Render с mobileconfig поддержкой
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -10,20 +10,23 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Разрешаем CORS (если нужно)
+// Разрешаем CORS
 app.use(cors());
 
-// Нужен сырой текст для получения mobileconfig (XML)
+// Нам нужно принимать сырые XML данные от mobileconfig
 app.use("/api/mobileconfig", express.text({ type: "*/*" }));
 
-// Отдача статики (index.html, css, js)
+// ====== Храним последнее устройство ======
+let lastDeviceReport = null;
+
+// ====== Раздача index.html и других статических файлов ======
 app.use(express.static(path.join(__dirname, "public"), {
   extensions: ["html"]
 }));
 
-// =========================================
-// 1. ОТДАЧА mobileconfig правильным MIME
-// =========================================
+// =======================================
+// 1. ОТДАЧА mobileconfig ПРАВИЛЬНЫМ MIME
+// =======================================
 app.get("/profile.mobileconfig", (req, res) => {
   const filePath = path.join(__dirname, "public", "profile.mobileconfig");
 
@@ -33,18 +36,18 @@ app.get("/profile.mobileconfig", (req, res) => {
   res.sendFile(filePath);
 });
 
-// =========================================
-// 2. ПРИЁМ ДАННЫХ ОТ ПРОФИЛЯ
-// =========================================
+// =======================================
+// 2. ПРИЁМ ДАННЫХ ОТ ПРОФИЛЯ (iPhone)
+// =======================================
 app.post("/api/mobileconfig", (req, res) => {
-  console.log("============== MOBILECONFIG REPORT ==============");
+  console.log("=========== MOBILECONFIG REPORT RECEIVED ===========");
   console.log(req.body);
-  console.log("=================================================");
+  console.log("====================================================");
 
-  // Можно распарсить XML → JSON → сохранить/отправить в Telegram
-  // Я могу добавить это по запросу
+  // сохраняем XML для вывода на сайт
+  lastDeviceReport = req.body;
 
-  // Ответ iPhone ОБЯЗАТЕЛЬНО
+  // ОБЯЗАТЕЛЬНО: ответ iPhone
   res.set("Content-Type", "application/xml");
   res.send(`
     <?xml version="1.0" encoding="UTF-8"?>
@@ -56,16 +59,24 @@ app.post("/api/mobileconfig", (req, res) => {
   `);
 });
 
-// =========================================
-// 3. HEALTH CHECK (Render требует)
-// =========================================
+// =======================================
+// 3. Эндпоинт для index.html → показать XML
+// =======================================
+app.get("/get-last-device", (req, res) => {
+  res.set("Content-Type", "text/plain");
+  res.send(lastDeviceReport || "Пока данных нет. Установите профиль.");
+});
+
+// =======================================
+// 4. HEALTH CHECK для Render
+// =======================================
 app.get("/healthz", (req, res) => {
   res.json({ ok: true });
 });
 
-// =========================================
-// 4. Запуск
-// =========================================
+// =======================================
+// 5. Запуск сервера
+// =======================================
 app.listen(PORT, () => {
   console.log(`SERVER RUNNING ON PORT ${PORT}`);
 });

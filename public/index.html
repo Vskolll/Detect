@@ -1,31 +1,100 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <title>iOS Installer Checker</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="UTF-8">
+<title>iOS Device Checker</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <link rel="stylesheet" href="style.css" />
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background: #020814;
+        color: #fff;
+        font-family: Arial, sans-serif;
+    }
+
+    .container {
+        max-width: 600px;
+        margin: 40px auto;
+        padding: 20px;
+        background: #0b101c;
+        border-radius: 20px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.4);
+    }
+
+    h1 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #ffb800;
+    }
+
+    .btn {
+        width: 100%;
+        padding: 15px;
+        background: #ffb800;
+        border: none;
+        border-radius: 12px;
+        font-size: 20px;
+        cursor: pointer;
+        margin-bottom: 20px;
+        font-weight: bold;
+    }
+
+    .btn:hover {
+        opacity: 0.85;
+    }
+
+    #deviceOutput {
+        background: #111;
+        color: #0f0;
+        padding: 20px;
+        border-radius: 14px;
+        white-space: pre-wrap;
+        min-height: 250px;
+        font-size: 14px;
+        margin-top: 20px;
+    }
+</style>
 </head>
 
 <body>
 
-  <div class="card">
-    
-    <a href="/profile.mobileconfig" download>
-  <button style="font-size:22px;padding:14px 24px;">
-    Установить профиль проверки устройства
-  </button>
-</a>
+<div class="container">
+    <h1>Проверка устройства iOS</h1>
 
-    <h1>Проверка инсталлеров iOS</h1>
-    <p>Идёт проверка AltStore, ESign, GBox, KSign, TestFlight</p>
+    <!-- Кнопка для установки профиля -->
+    <a href="/profile.mobileconfig">
+        <button class="btn">Установить профиль проверки устройства</button>
+    </a>
 
-    <button id="checkBtn">Проверить</button>
+    <h2 style="text-align:center; color:#e5e7eb; font-size:18px;">
+        После установки профиль отправит данные на сервер автоматически.<br>
+        Результат появится ниже.
+    </h2>
 
-    <pre id="output">Нажмите "Проверить"</pre>
-  </div>
+    <!-- Здесь будет показан результат -->
+    <pre id="deviceOutput">
+Ожидание данных...
+    </pre>
+</div>
 
-  <script src="app.js"></script>
+<script>
+function updateDeviceData() {
+    fetch("/get-last-device")
+        .then(res => res.text())
+        .then(text => {
+            document.getElementById("deviceOutput").textContent = text;
+        })
+        .catch(() => {
+            document.getElementById("deviceOutput").textContent = "Ошибка загрузки данных.";
+        });
+}
+
+// Обновление каждые 2 сек
+setInterval(updateDeviceData, 2000);
+updateDeviceData();
+</script>
+
 </body>
 </html>
