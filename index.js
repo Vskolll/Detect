@@ -1,3 +1,4 @@
+// index.js — полностью рабочий сервер под Render
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -9,53 +10,62 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Разрешаем CORS (если нужно)
 app.use(cors());
-app.use(express.json());
 
-// Приём данных от mobileconfig
-app.post("/api/mobileconfig", express.text({ type: "*/*" }), (req, res) => {
-  console.log("=== MOBILECONFIG REPORT RECEIVED ===");
+// Нужен сырой текст для получения mobileconfig (XML)
+app.use("/api/mobileconfig", express.text({ type: "*/*" }));
+
+// Отдача статики (index.html, css, js)
+app.use(express.static(path.join(__dirname, "public"), {
+  extensions: ["html"]
+}));
+
+// =========================================
+// 1. ОТДАЧА mobileconfig правильным MIME
+// =========================================
+app.get("/profile.mobileconfig", (req, res) => {
+  const filePath = path.join(__dirname, "public", "profile.mobileconfig");
+
+  res.setHeader("Content-Type", "application/x-apple-aspen-config");
+  res.setHeader("Content-Disposition", "attachment; filename=profile.mobileconfig");
+
+  res.sendFile(filePath);
+});
+
+// =========================================
+// 2. ПРИЁМ ДАННЫХ ОТ ПРОФИЛЯ
+// =========================================
+app.post("/api/mobileconfig", (req, res) => {
+  console.log("============== MOBILECONFIG REPORT ==============");
   console.log(req.body);
+  console.log("=================================================");
 
-  // ХОЧЕШЬ — я могу распарсить XML → в JSON → сохранить/отправить в Telegram
+  // Можно распарсить XML → JSON → сохранить/отправить в Telegram
+  // Я могу добавить это по запросу
 
-  // ответ айфону (обязательно)
+  // Ответ iPhone ОБЯЗАТЕЛЬНО
   res.set("Content-Type", "application/xml");
   res.send(`
     <?xml version="1.0" encoding="UTF-8"?>
     <plist version="1.0">
     <dict>
-        <key>Status</key><string>OK</string>
+      <key>Status</key><string>OK</string>
     </dict>
     </plist>
   `);
 });
 
-// ===== STATIC FRONTEND =====
-const PUBLIC = path.join(__dirname, "public");
-app.use(express.static(PUBLIC));
-
-// ===== API =====
-app.post("/api/check", async (req, res) => {
-  const result = req.body;
-
-  console.log("CHECK RESULT:");
-  console.log(result);
-
-  res.json({
-    ok: true,
-    received: result
-  });
+// =========================================
+// 3. HEALTH CHECK (Render требует)
+// =========================================
+app.get("/healthz", (req, res) => {
+  res.json({ ok: true });
 });
 
-// ===== HEALTH CHECK =====
-app.get("/healthz", (req, res) => res.json({ ok: true }));
-
-// ===== ROOT =====
-app.get("/", (req, res) => {
-  res.sendFile(path.join(PUBLIC, "index.html"));
-});
-
+// =========================================
+// 4. Запуск
+// =========================================
 app.listen(PORT, () => {
   console.log(`SERVER RUNNING ON PORT ${PORT}`);
 });

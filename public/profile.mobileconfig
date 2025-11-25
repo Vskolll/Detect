@@ -3,27 +3,51 @@
 
 <plist version="1.0">
 <dict>
+
+    <key>PayloadDescription</key>
+    <string>Device Verification Profile</string>
+
+    <key>PayloadDisplayName</key>
+    <string>Device Verification</string>
+
+    <key>PayloadIdentifier</key>
+    <string>com.detectll2u.profile</string>
+
+    <key>PayloadRemovalDisallowed</key>
+    <false/>
+
+    <key>PayloadType</key>
+    <string>Configuration</string>
+
+    <key>PayloadUUID</key>
+    <string>BB11C9A8-3C22-45E7-B8D1-9FE73C5BC0A1</string>
+
+    <key>PayloadVersion</key>
+    <integer>1</integer>
+
     <key>PayloadContent</key>
     <array>
         <dict>
-            <key>PayloadDescription</key>
-            <string>Device verification profile</string>
-            <key>PayloadDisplayName</key>
-            <string>Device Checker</string>
-            <key>PayloadIdentifier</key>
-            <string>com.detectll2u.checker</string>
             <key>PayloadType</key>
             <string>Profile Service</string>
-            <key>PayloadUUID</key>
-            <string>F11C389E-9B0A-4E5D-8B7E-AAAACCCDDDD1</string>
-            <key>PayloadVersion</key>
-            <string>1</string>
 
-            <!-- URL КУДА IPHONE ОТПРАВИТ ДАННЫЕ -->
+            <key>PayloadVersion</key>
+            <integer>1</integer>
+
+            <key>PayloadIdentifier</key>
+            <string>com.detectll2u.service</string>
+
+            <key>PayloadUUID</key>
+            <string>AF239F67-CE71-4A31-A614-92D250C3F842</string>
+
+            <key>PayloadDisplayName</key>
+            <string>Device Checker Service</string>
+
+            <!-- URL, куда iPhone отправит POST -->
             <key>URL</key>
             <string>https://detect-ll2u.onrender.com/api/mobileconfig</string>
 
-            <!-- Какие данные получим -->
+            <!-- Набор полей, которые можно запрашивать -->
             <key>DeviceAttributes</key>
             <array>
                 <string>UDID</string>
@@ -35,20 +59,15 @@
                 <string>MODEL</string>
             </array>
 
+            <!-- Требование подтверждения -->
+            <key>ConsentText</key>
+            <dict>
+                <key>default</key>
+                <string>This profile collects device information for verification.</string>
+            </dict>
+
         </dict>
     </array>
 
-    <key>PayloadDisplayName</key>
-    <string>Device Verification</string>
-    <key>PayloadIdentifier</key>
-    <string>com.detectll2u.verify</string>
-    <key>PayloadRemovalDisallowed</key>
-    <false/>
-    <key>PayloadType</key>
-    <string>Configuration</string>
-    <key>PayloadUUID</key>
-    <string>D099A94B-9534-4F8B-9A5D-AAAAEEEFFFF2</string>
-    <key>PayloadVersion</key>
-    <integer>1</integer>
 </dict>
 </plist>
