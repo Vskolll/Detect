@@ -1,95 +1,84 @@
-// === ЛОГИКА ДЕТЕКЦИИ ИНСТАЛЛЕРОВ НА IOS (2025) ===
-// Метод основан на том, что если приложение УСТАНОВЛЕНО,
-// Safari УХОДИТ в background (переход в схему), а затем ВОЗВРАЩАЕТСЯ.
-// Мы фиксируем момент возврата через visibilitychange.
-
-// === Детектор конкретной схемы ===
-async function detectInstaller(scheme) {
+// === Детект одной схемы ===
+async function detectSingle(schemeName, schemeUrl) {
   return new Promise(resolve => {
-    sessionStorage.setItem("installer_test", "checking");
+    let returned = false;        // Safari вернулся?
+    let dialogShown = false;     // Был ли диалог “Open App?”
 
-    let finished = false;
+    sessionStorage.setItem("scheme_test", schemeName);
 
-    // Таймер: если Safari НЕ ушёл в background → приложение НЕ установлено
-    const timeout = setTimeout(() => {
-      if (!finished) {
-        finished = true;
-        sessionStorage.setItem("installer_test", "noapp");
-        resolve(false);
+    // Запускаем тест схемы
+    const launchTime = Date.now();
+
+    // Таймер на диалог: если Safari НЕ ушёл через 300–600мс → был диалог
+    const dialogTimer = setTimeout(() => {
+      if (!returned) {
+        dialogShown = true;
       }
-    }, 1200);
+    }, 500);
 
-    // Пытаемся открыть схему (если приложение есть — Safari уйдёт)
+    // Таймер окончания (Safari игнорирует схему)
+    const failTimer = setTimeout(() => {
+      if (!returned) {
+        resolve({ status: "NOT_FOUND", scheme: schemeName, dialog: dialogShown });
+      }
+    }, 1500);
+
+    // Запуск схемы
     try {
-      window.location.href = scheme;
+      window.location.href = schemeUrl;
     } catch (e) {}
 
-    // Отслеживаем возвращение Safari назад
+    // Если Safari УШЁЛ и ВЕРНУЛСЯ
     document.addEventListener("visibilitychange", () => {
-      if (document.visibilityState === "visible" && !finished) {
-        finished = true;
-        clearTimeout(timeout);
-        sessionStorage.setItem("installer_test", "installed");
-        resolve(true);
+      if (document.visibilityState === "visible" && !returned) {
+        returned = true;
+        clearTimeout(dialogTimer);
+        clearTimeout(failTimer);
+
+        // Safari ушёл → приложение стоит
+        resolve({ status: "INSTALLED", scheme: schemeName, dialog: dialogShown });
       }
     });
   });
 }
 
-// === ПОСЛЕДОВАТЕЛЬНАЯ ПРОВЕРКА ВСЕХ ИНСТАЛЛЕРОВ ===
-async function checkAllInstallers() {
-  const installers = [
-    { name: "TestFlight", scheme: "itms-beta://" },
-    { name: "AltStore",   scheme: "altstore://" },
-    { name: "ESign",      scheme: "esign://" },
-    { name: "GBox",       scheme: "gbox://" },
-    { name: "GBoxAlt",    scheme: "gboxapp://" },
-    { name: "KSign",      scheme: "ksign://" },
-    { name: "KStore",     scheme: "kstore://" }
-  ];
-
-  const result = {};
-
-  for (let app of installers) {
-    const ok = await detectInstaller(app.scheme);
-
-    result[app.name] = ok ? "INSTALLED" : "NOT_FOUND";
-
-    // Пауза 1 секунда, чтобы Safari успел полностью восстановиться
-    await new Promise(r => setTimeout(r, 1000));
-  }
-
-  return result;
-}
-
-// === ВЗАИМОДЕЙСТВИЕ С КНОПКОЙ ===
+// === Главное действие кнопки ===
 document.addEventListener("DOMContentLoaded", () => {
   const btn = document.getElementById("checkBtn");
   const out = document.getElementById("output");
 
-  if (!btn || !out) {
-    console.error("ERROR: кнопка или output не найдены в HTML.");
-    return;
-  }
-
   btn.addEventListener("click", async () => {
-    out.textContent = "Проверяем... Останьтесь на странице.\n";
-    sessionStorage.removeItem("installer_test");
+    out.textContent = "Запуск проверки...\n";
 
-    const result = await checkAllInstallers();
+    // Тестируем каждое приложение ОТДЕЛЬНО
+    const checks = [
+      ["TestFlight", "itms-beta://"],
+      ["AltStore", "altstore://"],
+      ["ESign", "esign://"],
+      ["GBox", "gbox://"],
+      ["GBoxAlt", "gboxapp://"],
+      ["KSign", "ksign://"],
+      ["KStore", "kstore://"],
+    ];
 
-    out.textContent = JSON.stringify(result, null, 2);
+    const result = {};
 
-    // отправка результата на сервер
-    fetch("/api/check", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(result)
-    })
-    .then(r => r.json())
-    .then(serverRes => {
-      out.textContent += "\n\nОтвет сервера:\n" +
-        JSON.stringify(serverRes, null, 2);
-    });
+    for (const [name, url] of checks) {
+      out.textContent += `\nПроверяем: ${name}...\n`;
+      const r = await detectSingle(name, url);
+
+      result[name] = r.status;
+
+      if (r.dialog) {
+        result[name] += " (OPEN PROMPT)";
+      }
+
+      out.textContent += `${name}: ${result[name]}\n`;
+
+      // Ждём между тестами
+      await new Promise(r => setTimeout(r, 700));
+    }
+
+    out.textContent += "\nПолный результат:\n" + JSON.stringify(result, null, 2);
   });
 });
