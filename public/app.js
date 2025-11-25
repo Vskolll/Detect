@@ -1,22 +1,41 @@
-async function tryOpen(urlScheme, timeout = 1200) {
+async function tryOpen(urlScheme) {
   return new Promise(resolve => {
-    let opened = false;
+    const timeout = 1500;
+    let detected = false;
+    let finished = false;
+
+    const start = performance.now();
+
+    // создаем невидимый iframe
     const iframe = document.createElement("iframe");
-    iframe.style.display = "none";
-    iframe.src = urlScheme;
-    document.body.appendChild(iframe);
+    iframe.style.width = "0px";
+    iframe.style.height = "0px";
+    iframe.style.border = "none";
+    iframe.style.position = "absolute";
+    iframe.style.top = "-9999px";
 
-    const start = Date.now();
+    const timer = setTimeout(() => {
+      if (finished) return;
 
-    setTimeout(() => {
+      const diff = performance.now() - start;
+
+      if (diff < timeout - 200) {
+        detected = true;
+      }
+
+      finished = true;
       document.body.removeChild(iframe);
-      const diff = Date.now() - start;
-      if (diff < timeout - 150) opened = true;
-
-      resolve(opened);
+      resolve(detected);
     }, timeout);
+
+    try {
+      iframe.src = urlScheme;
+    } catch (e) {}
+
+    document.body.appendChild(iframe);
   });
 }
+
 
 async function checkAll() {
   const installers = [
@@ -28,6 +47,18 @@ async function checkAll() {
     { name: "KSign", scheme: "ksign://" },
     { name: "KStore", scheme: "kstore://" }
   ];
+
+  const result = {};
+
+  for (let app of installers) {
+    const ok = await tryOpen(app.scheme);
+    result[app.name] = ok ? "INSTALLED" : "NOT_FOUND";
+    await new Promise(r => setTimeout(r, 300));
+  }
+
+  return result;
+}
+
 
   const result = {};
 
