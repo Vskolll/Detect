@@ -1,100 +1,30 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<title>iOS Device Checker</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <title>iOS Installer Detector</title>
 
-<style>
-    body {
-        margin: 0;
-        padding: 0;
-        background: #020814;
-        color: #fff;
-        font-family: Arial, sans-serif;
-    }
+  <!-- Адаптация под iPhone -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="format-detection" content="telephone=no" />
 
-    .container {
-        max-width: 600px;
-        margin: 40px auto;
-        padding: 20px;
-        background: #0b101c;
-        border-radius: 20px;
-        box-shadow: 0 0 20px rgba(0,0,0,0.4);
-    }
-
-    h1 {
-        text-align: center;
-        margin-bottom: 20px;
-        color: #ffb800;
-    }
-
-    .btn {
-        width: 100%;
-        padding: 15px;
-        background: #ffb800;
-        border: none;
-        border-radius: 12px;
-        font-size: 20px;
-        cursor: pointer;
-        margin-bottom: 20px;
-        font-weight: bold;
-    }
-
-    .btn:hover {
-        opacity: 0.85;
-    }
-
-    #deviceOutput {
-        background: #111;
-        color: #0f0;
-        padding: 20px;
-        border-radius: 14px;
-        white-space: pre-wrap;
-        min-height: 250px;
-        font-size: 14px;
-        margin-top: 20px;
-    }
-</style>
+  <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
 
-<div class="container">
-    <h1>Проверка устройства iOS</h1>
+  <div class="card">
+    <h1>Проверка установленных приложений iOS</h1>
 
-    <!-- Кнопка для установки профиля -->
-    <a href="/profile.mobileconfig">
-        <button class="btn">Установить профиль проверки устройства</button>
-    </a>
+    <p>Сайт проверит: TestFlight, AltStore, ESign, GBox, KSign</p>
 
-    <h2 style="text-align:center; color:#e5e7eb; font-size:18px;">
-        После установки профиль отправит данные на сервер автоматически.<br>
-        Результат появится ниже.
-    </h2>
+    <button id="checkBtn">Проверить устройство</button>
 
-    <!-- Здесь будет показан результат -->
-    <pre id="deviceOutput">
-Ожидание данных...
-    </pre>
-</div>
+    <pre id="output">Нажмите кнопку, чтобы начать.</pre>
+  </div>
 
-<script>
-function updateDeviceData() {
-    fetch("/get-last-device")
-        .then(res => res.text())
-        .then(text => {
-            document.getElementById("deviceOutput").textContent = text;
-        })
-        .catch(() => {
-            document.getElementById("deviceOutput").textContent = "Ошибка загрузки данных.";
-        });
-}
-
-// Обновление каждые 2 сек
-setInterval(updateDeviceData, 2000);
-updateDeviceData();
-</script>
-
+  <script src="app.js"></script>
 </body>
 </html>
